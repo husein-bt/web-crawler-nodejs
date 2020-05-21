@@ -1,5 +1,31 @@
 var Crawler = require("crawler");
 
+var c2 = new Crawler({
+    rateLimit: 2000,
+    maxConnections : 2,
+
+    // This will be called for each crawled page
+    callback : function (error, res, done) {
+        if(error){
+            console.log(error);
+        }else{
+            var $ = res.$;
+            // $ is Cheerio by default
+            //a lean implementation of core jQuery designed specifically for the server
+            // console.log($("title").text());
+            // console.log($(".product-brand").text());
+            // console.log($(".product-name").text());
+            // console.log($(".js-final-sale-price").text());
+
+            $(".thumb-nail.d-lg-block img").each(function(index,img){
+                setInterval(()=>{},1000)
+                console.log(img.attribs.src);
+            });
+        }
+        done();
+    }
+});
+
 var c = new Crawler({
     rateLimit: 2000,
     maxConnections : 2,
@@ -29,14 +55,19 @@ var c = new Crawler({
             //     console.log(img.attribs.src);
             // });
             if($(".color-attribute")){
-                $(".color-attribute").each(function(index,img){
+                $(".color-attribute").each(function(index,colors){
                     setInterval(()=>{},1000)
-                    console.log(img.attribs.src);
+                    console.log(colors.attribs['aria-describedby']);
+                    c2.queue({
+                        uri: colors.attribs['data-url'],
+                        headers: {'user-agent': 'node.js'}
+                    });
                 });
             }else{
                 $(".thumb-nail.d-lg-block img").each(function(index,img){
                         setInterval(()=>{},1000)
                         console.log(img.attribs.src);
+                        
                     });
             }
             
@@ -45,31 +76,7 @@ var c = new Crawler({
     }
 });
 
-var c2 = new Crawler({
-    rateLimit: 2000,
-    maxConnections : 2,
 
-    // This will be called for each crawled page
-    callback : function (error, res, done) {
-        if(error){
-            console.log(error);
-        }else{
-            var $ = res.$;
-            // $ is Cheerio by default
-            //a lean implementation of core jQuery designed specifically for the server
-            // console.log($("title").text());
-            // console.log($(".product-brand").text());
-            // console.log($(".product-name").text());
-            // console.log($(".js-final-sale-price").text());
-
-            $(".thumb-nail.d-lg-block img").each(function(index,img){
-                setInterval(()=>{},1000)
-                console.log(img.attribs.src);
-            });
-        }
-        done();
-    }
-});
 
 // Queue just one URL, with default callback
 // c.queue('https://www.amazon.com');
